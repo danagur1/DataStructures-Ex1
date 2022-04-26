@@ -1,15 +1,15 @@
-#username - danagur1
-#id1      - 328301072
-#name1    - Dana Gur
-#id2      - complete info
-#name2    - complete info  
-
+# username - danagur1
+# id1      - 328301072
+# name1    - Dana Gur
+# id2      - complete info
+# name2    - complete info
 
 
 """A class represnting a node in an AVL tree"""
 
+
 class AVLNode(object):
-	"""Constructor, you are allowed to add more fields. 
+	"""Constructor, you are allowed to add more fields.
 
 	@type value: str
 	@param value: data of your node
@@ -20,7 +20,7 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.height = -1
-		
+		self.size = 0
 
 	"""returns the left child
 	@rtype: AVLNode
@@ -28,7 +28,6 @@ class AVLNode(object):
 	"""
 	def getLeft(self):
 		return None
-
 
 	"""returns the right child
 
@@ -111,21 +110,28 @@ class AVLNode(object):
 		return False
 
 
+def listToArrayRec(return_list, return_list_idx, curr_elem):
+	if curr_elem is not None:
+		listToArrayRec(curr_elem.left)
+		return_list[return_list_idx] = curr_elem
+		listToArrayRec(curr_elem.right)
+
 
 """
 A class implementing the ADT list, using an AVL tree.
 """
 
+
 class AVLTreeList(object):
 
 	"""
-	Constructor, you are allowed to add more fields.  
+	Constructor, you are allowed to add more fields.
 
 	"""
 	def __init__(self):
 		self.root = None
-		# add your fields here
-
+		self.last_elem = None # pointer to the last element in the list
+		self.first_elem = None # pointer to the first element in the list
 
 	"""returns whether the list is empty
 
@@ -134,7 +140,6 @@ class AVLTreeList(object):
 	"""
 	def empty(self):
 		return None
-
 
 	"""retrieves the value of the i'th item in the list
 
@@ -179,7 +184,7 @@ class AVLTreeList(object):
 	@returns: the value of the first item, None if the list is empty
 	"""
 	def first(self):
-		return None
+		return self.first_node
 
 	"""returns the value of the last item in the list
 
@@ -187,15 +192,22 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
 	def last(self):
-		return None
+		return self.last_node
+
 
 	"""returns an array representing list 
 
 	@rtype: list
 	@returns: a list of strings representing the data structure
 	"""
+
 	def listToArray(self):
-		return None
+		return_list = [None]*self.root.size
+		return_list_idx = 0
+		curr_elem = self.root
+		listToArrayRec(return_list, return_list_idx, curr_elem)
+		return return_list
+
 
 	"""returns the size of the list 
 
@@ -203,7 +215,7 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
 	def length(self):
-		return None
+		return self.root.size
 
 	"""splits the list at the i'th index
 
@@ -215,7 +227,46 @@ class AVLTreeList(object):
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
 	def split(self, i):
-		return None
+		left_tree = AVLTreeList()
+		first_left = True
+		right_tree = AVLTreeList()
+		first_right = True
+		curr_elem = self.root
+		curr_idx = curr_elem.left.size + 1
+		while curr_idx != i:
+			if i < curr_idx:
+				if first_left:
+					left_tree.root = curr_elem
+					curr_elem.parent = None
+					first_left = False
+				else:
+					left_tree_curr.left = curr_elem
+					curr_elem.parent = left_tree_curr
+				left_tree_curr = curr_elem
+				curr_elem = curr_elem.left
+			if i > curr_idx:
+				if first_right:
+					right_tree.root = curr_elem
+					curr_elem.parent = None
+					first_right = False
+				else:
+					right_tree_curr.right = curr_elem
+					curr_elem.parent = right_tree_curr
+				right_tree_curr = curr_elem
+				curr_elem = curr_elem.right
+		left_tree_curr.left = curr_elem.left
+		curr_elem.left.parent = left_tree_curr
+		right_tree_curr.right = curr_elem.right
+		curr_elem.right.parent = right_tree_curr
+		# update sizes in right tree:
+		while right_tree_curr is not None:
+			right_tree_curr = right_tree_curr.right+right_tree_curr.left+1
+			right_tree_curr = right_tree_curr.parent
+		# update sizes in left tree:
+		while left_tree_curr is not None:
+			left_tree_curr = left_tree_curr.right + left_tree_curr.left + 1
+			left_tree_curr = left_tree_curr.parent
+		return left_tree_curr, curr_elem.val, right_tree_curr
 
 	"""concatenates lst to self
 
