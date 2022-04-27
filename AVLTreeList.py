@@ -1,113 +1,131 @@
 # username - danagur1
 # id1      - 328301072
 # name1    - Dana Gur
-# id2      - complete info
-# name2    - complete info
+# id2      - 327703831
+# name2    - Ofer Bogoslavsky
 
 
 """A class represnting a node in an AVL tree"""
 
 
 class AVLNode(object):
-	"""Constructor, you are allowed to add more fields.
+    """Constructor, you are allowed to add more fields.
 
-	@type value: str
-	@param value: data of your node
-	"""
-	def __init__(self, value):
-		self.value = value
-		self.left = None
-		self.right = None
-		self.parent = None
-		self.height = -1
-		self.size = 0
+    @type value: str
+    @param value: data of your node
+    """
 
-	"""returns the left child
-	@rtype: AVLNode
-	@returns: the left child of self, None if there is no left child
-	"""
-	def getLeft(self):
-		return None
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+        self.parent = None
+        self.height = -1
+        self.size = 0
 
-	"""returns the right child
+    """returns the left child
+    @rtype: AVLNode
+    @returns: the left child of self, None if there is no left child
+    """
 
-	@rtype: AVLNode
-	@returns: the right child of self, None if there is no right child
-	"""
-	def getRight(self):
-		return None
+    def getLeft(self):
+        return self.left
 
-	"""returns the parent 
+    """returns the right child
 
-	@rtype: AVLNode
-	@returns: the parent of self, None if there is no parent
-	"""
-	def getParent(self):
-		return None
+    @rtype: AVLNode
+    @returns: the right child of self, None if there is no right child
+    """
 
-	"""return the value
+    def getRight(self):
+        return self.right
 
-	@rtype: str
-	@returns: the value of self, None if the node is virtual
-	"""
-	def getValue(self):
-		return None
+    """returns the parent 
 
-	"""returns the height
+    @rtype: AVLNode
+    @returns: the parent of self, None if there is no parent
+    """
 
-	@rtype: int
-	@returns: the height of self, -1 if the node is virtual
-	"""
-	def getHeight(self):
-		return -1
+    def getParent(self):
+        return self.parent
 
-	"""sets left child
+    """return the value
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setLeft(self, node):
-		return None
+    @rtype: str
+    @returns: the value of self, None if the node is virtual
+    """
 
-	"""sets right child
+    def getValue(self):
+        return self.value
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setRight(self, node):
-		return None
+    """returns the height
 
-	"""sets parent
+    @rtype: int
+    @returns: the height of self, -1 if the node is virtual
+    """
 
-	@type node: AVLNode
-	@param node: a node
-	"""
-	def setParent(self, node):
-		return None
+    def getHeight(self):
+        return self.height
 
-	"""sets value
 
-	@type value: str
-	@param value: data
-	"""
-	def setValue(self, value):
-		return None
+    """sets left child
 
-	"""sets the balance factor of the node
+    @type node: AVLNode
+    @param node: a node
+    """
 
-	@type h: int
-	@param h: the height
-	"""
-	def setHeight(self, h):
-		return None
+    def setLeft(self, node):
+        self.left = node
+        return None
 
-	"""returns whether self is not a virtual node 
+    """sets right child
 
-	@rtype: bool
-	@returns: False if self is a virtual node, True otherwise.
-	"""
-	def isRealNode(self):
-		return False
+    @type node: AVLNode
+    @param node: a node
+    """
+
+    def setRight(self, node):
+        self.right = node
+        return None
+
+    """sets parent
+
+    @type node: AVLNode
+    @param node: a node
+    """
+
+    def setParent(self, node):
+        self.parent = node
+        return None
+
+    """sets value
+
+    @type value: str
+    @param value: data
+    """
+
+    def setValue(self, value):
+        self.value = value
+        return None
+
+    """sets the balance factor of the node
+
+    @type h: int
+    @param h: the height
+    """
+
+    def setHeight(self, h):
+        self.height = h
+        return None
+
+    """returns whether self is not a virtual node 
+
+    @rtype: bool
+    @returns: False if self is a virtual node, True otherwise.
+    """
+
+    def isRealNode(self):
+        return self.height != -1
 
 
 def listToArrayRec(return_list, return_list_idx, curr_elem):
@@ -143,14 +161,36 @@ class AVLTreeList(object):
 
 	"""retrieves the value of the i'th item in the list
 
-	@type i: int
-	@pre: 0 <= i < self.length()
-	@param i: index in the list
-	@rtype: str
-	@returns: the the value of the i'th item in the list
-	"""
-	def retrieve(self, i):
-		return None
+	    def empty(self):
+        return self.root in None
+
+
+	def find(self, i):  # returns the i'th node
+        assert 0 <= i < self.root.size
+        i += 1
+        node = self.root
+        small_items = 0  # number of items in list that are smaller than node (by index)
+        while node.isRealNode():
+            if node.left.size + small_items >= i:
+                node = node.left
+            elif node.left.size + small_items == i - 1:  # there are exactly i-1 items smaller than node
+                return node
+            else:  # all the left children of node are smaller than node.right
+                small_items += node.left.size + 1
+                node = node.right
+        raise Exception(f"problem in find({i})")  # we shouldn't get here
+    	"""retrieves the value of the i'th item in the list
+
+    	@type i: int
+    	@pre: 0 <= i < self.length()
+    	@param i: index in the list
+    	@rtype: str
+    	@returns: the the value of the i'th item in the list
+    	"""
+    
+
+    	def retrieve(self, i):
+        	return self.find(i).value
 
 	"""inserts val at position i in the list
 
