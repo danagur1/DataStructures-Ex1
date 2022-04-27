@@ -157,28 +157,26 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		return None
+        	return self.root is None
 
-	"""retrieves the value of the i'th item in the list
-
-	    def empty(self):
-        return self.root in None
+	
 
 
 	def find(self, i):  # returns the i'th node
-        assert 0 <= i < self.root.size
-        i += 1
-        node = self.root
-        small_items = 0  # number of items in list that are smaller than node (by index)
-        while node.isRealNode():
-            if node.left.size + small_items >= i:
-                node = node.left
-            elif node.left.size + small_items == i - 1:  # there are exactly i-1 items smaller than node
-                return node
-            else:  # all the left children of node are smaller than node.right
-                small_items += node.left.size + 1
-                node = node.right
-        raise Exception(f"problem in find({i})")  # we shouldn't get here
+        	assert 0 <= i < self.root.size
+        	i += 1
+        	node = self.root
+        	small_items = 0  # number of items in list that are smaller than node (by index)
+        	while node.isRealNode():
+        	    if node.left.size + small_items >= i:
+        	        node = node.left
+        	    elif node.left.size + small_items == i - 1:  # there are exactly i-1 items smaller than node
+        	        return node
+        	    else:  # all the left children of node are smaller than node.right
+        	        small_items += node.left.size + 1
+        	        node = node.right
+        	raise Exception(f"problem in find({i})")  # we shouldn't get here
+		
     	"""retrieves the value of the i'th item in the list
 
     	@type i: int
@@ -203,7 +201,136 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, i, val):
-		return -1
+        new_node = AVLNode(val)
+        new_node.height = 0
+        new_node.size = 1
+        new_node.left = AVLNode(val)
+        new_node.right = AVLNode(val)
+        if i == 0:
+            new_node.parent = self.first_elem
+            self.first_elem.left = new_node
+            self.first_elem = new_node
+        elif i == self.root.size - 1:
+            new_node.parent = self.last_elem
+            self.last_elem.right = new_node
+            self.last_elem = new_node
+        else:
+            node = self.find(i)
+            if not node.left.isRealNode:
+                node.left = new_node
+                new_node.parent = node
+            else:
+                node = self.find(i-1)
+                node.right = new_node
+                new_node.parent = node
+
+        # set size:
+        node = new_node.parent
+        while node is not None:
+            node.size = node.left.size + node.right.size
+
+        # fix_the_tree:
+        node = new_node.parent
+
+        while node is not None and abs(node.left.height - node.right.height) < 2:
+            prev_h = node.height
+            node.height = node.left.height + node.right.height
+            if prev_h == node.height:
+                return 0
+            node = node.parent
+        # now |BF(node)| = 2. rotation:
+        print("+-2 = ", node.left.height - node.right.height, " ?")
+        if node.left.height > node.right.height:
+            if node.left.left.height > node.left.right.height:
+                # right rotation:
+                B = node
+                A = node.left
+                Ar = A.right
+                B_parent = B.parent
+                if B_parent is None:
+                    self.root = A
+                    A.parent = None
+                else:
+                    A.parent = B_parent
+                    if B == B_parent.left:
+                        B_parent.left = A
+                    else:
+                        B_parent.right = A
+                B.parent = A
+                A.right = B
+                B.left = Ar
+                Ar.parent = B
+            else:
+                # left then right rotation:
+                C = node
+                A = C.left
+                B = A.right
+                Bl = B.left
+                Br = B.right
+                C_parent = C.parent
+                if C_parent is None:
+                    self.root = B
+                    B.parent = None
+                else:
+                    B.parent = C_parent
+                    if C == C_parent.left:
+                        C_parent.left = B
+                    else:
+                        C_parent.right = B
+                B.left = A
+                B.right = C
+                A.parent = B
+                C.parent = B
+                A.right = Bl
+                C.left = Br
+                Bl.parent = A
+                Br.parent = C
+
+        else:
+            if node.right.left.height < node.right.right.height:
+                # left rotation:
+                B = node
+                A = node.right
+                Al = A.left
+                B_parent = B.parent
+                if B_parent is None:
+                    self.root = A
+                    A.parent = None
+                else:
+                    A.parent = B_parent
+                    if B == B_parent.left:
+                        B_parent.left = A
+                    else:
+                        B_parent.right = A
+                B.parent = A
+                A.left = B
+                B.right = Al
+            else:
+                # right then left rotation:
+                C = node
+                A = C.right
+                B = A.left
+                Bl = B.left
+                Br = B.right
+                C_parent = C.parent
+                if C_parent is None:
+                    self.root = B
+                    B.parent = None
+                else:
+                    B.parent = C_parent
+                    if C == C_parent.left:
+                        C_parent.left = B
+                    else:
+                        C_parent.right = B
+                B.right = A
+                B.left = C
+                A.parent = B
+                C.parent = B
+                C.right = Bl
+                A.left = Br
+                Bl.parent = A
+                Br.parent = C
+        return 1
 
 
 	"""deletes the i'th item in the list
@@ -336,6 +463,6 @@ class AVLTreeList(object):
 	@returns: the root, None if the list is empty
 	"""
 	def getRoot(self):
-		return None
+		return self.root
 
 
