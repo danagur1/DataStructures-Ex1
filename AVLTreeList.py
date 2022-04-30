@@ -135,6 +135,12 @@ class AVLNode(object):
     @rtype: bool
     @returns: False if self is a virtual node, True otherwise.
     """
+	
+	def update_size(self):
+        self.size = self.left.size + self.right.size + 1
+
+    def update_height(self):
+        self.height = max(self.left.height, self.right.height) + 1
 
     def isRealNode(self):
         return self.height != -1
@@ -173,7 +179,7 @@ class AVLTreeList(object):
     def empty(self):
         return self.root in None
 
-    def find(self, i):  # returns the i'th node
+    def find(self, i):  # returns the i'th node (0 <= i < n)
         assert 0 <= i < self.root.size
         i += 1
         node = self.root
@@ -211,6 +217,28 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
+        def l_rotate(self, node):
+        B = node
+        A = node.right
+        Al = A.left
+        B_parent = B.parent
+        if B_parent is None:
+            self.root = A
+            A.parent = None
+        else:
+            A.parent = B_parent
+            if B == B_parent.left:
+                B_parent.left = A
+            else:
+                B_parent.right = A
+        B.parent = A
+        A.left = B
+        B.right = Al
+        Al.parent = B
+
+        B.update_size()
+        A.update_size()
+
     def r_rotate(self, node):
         B = node
         A = node.left
@@ -230,23 +258,8 @@ class AVLTreeList(object):
         B.left = Ar
         Ar.parent = B
 
-    def l_rotate(self, node):
-        B = node
-        A = node.right
-        Al = A.left
-        B_parent = B.parent
-        if B_parent is None:
-            self.root = A
-            A.parent = None
-        else:
-            A.parent = B_parent
-            if B == B_parent.left:
-                B_parent.left = A
-            else:
-                B_parent.right = A
-        B.parent = A
-        A.left = B
-        B.right = Al
+        B.update_size()
+        A.update_size()
 
     def lr_rotate(self, node):
         C = node
@@ -273,6 +286,10 @@ class AVLTreeList(object):
         Bl.parent = A
         Br.parent = C
 
+        C.update_size()
+        A.update_size()
+        B.update_size()
+
     def rl_rotate(self, node):
         C = node
         A = C.right
@@ -295,26 +312,54 @@ class AVLTreeList(object):
         C.parent = B
         C.right = Bl
         A.left = Br
-        Bl.parent = A
-        Br.parent = C
+        Bl.parent = C
+        Br.parent = A
+
+        C.update_size()
+        A.update_size()
+        B.update_size()
+
+    def update_heights(self, node):
+        while node is not None:
+            node.update_height()
+            node = node.parent
+
+    """inserts val at position i in the list
+
+    @type i: int
+    @pre: 0 <= i <= self.length()
+    @param i: The intended index in the list to which we insert val
+    @type val: str
+    @param val: the value we inserts
+    @rtype: list
+    @returns: the number of rebalancing operation due to AVL rebalancing
+    """
 
     def insert(self, i, val):
+        assert 0 <= i <= self.length()
         new_node = AVLNode(val)
         new_node.height = 0
         new_node.size = 1
-        new_node.left = AVLNode(val)
-        new_node.right = AVLNode(val)
+        new_node.left = AVLNode(None)
+        new_node.right = AVLNode(None)
+        new_node.left.parent = new_node
+        new_node.right.parent = new_node
+        if self.empty():
+            self.root = new_node
+            self.first_elem = new_node
+            self.last_elem = new_node
+            return 0
         if i == 0:
             new_node.parent = self.first_elem
             self.first_elem.left = new_node
             self.first_elem = new_node
-        elif i == self.root.size - 1:
+        elif i == self.root.size:
             new_node.parent = self.last_elem
             self.last_elem.right = new_node
             self.last_elem = new_node
         else:
             node = self.find(i)
-            if not node.left.isRealNode:
+            if not node.left.isRealNode():
                 node.left = new_node
                 new_node.parent = node
             else:
@@ -325,19 +370,22 @@ class AVLTreeList(object):
         # set size:
         node = new_node.parent
         while node is not None:
-            node.size = node.left.size + node.right.size
+            node.update_size()
+            node = node.parent
 
         # fix_the_tree:
         node = new_node.parent
 
         while node is not None and abs(node.left.height - node.right.height) < 2:
             prev_h = node.height
-            node.height = node.left.height + node.right.height
+            node.update_height()
             if prev_h == node.height:
+                self.update_heights(node)
                 return 0
             node = node.parent
+        if node is None:
+            return 0
         # now |BF(node)| = 2. rotation:
-        print("+-2 = ", node.left.height - node.right.height, " ?")
         if node.left.height > node.right.height:
             if node.left.left.height > node.left.right.height:
                 # right rotation:
@@ -345,7 +393,6 @@ class AVLTreeList(object):
             else:
                 # left then right rotation:
                 self.lr_rotate(node)
-
         else:
             if node.right.left.height < node.right.right.height:
                 # left rotation:
