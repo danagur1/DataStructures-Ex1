@@ -140,12 +140,13 @@ class AVLNode(object):
         return self.height != -1
 
 
-def listToArrayRec(return_list, return_list_idx, curr_elem):
-    if curr_elem is not None:
-        listToArrayRec(curr_elem.left)
-        return_list[return_list_idx] = curr_elem
-        listToArrayRec(curr_elem.right)
-
+def listToArrayRec(return_list, curr_elem):
+    global return_list_idx
+	if curr_elem is not None:
+		listToArrayRec(curr_elem.left)
+		return_list[return_list_idx] = curr_elem
+		return_list_idx += 1
+		listToArrayRec(curr_elem.right)
 
 """
 A class implementing the ADT list, using an AVL tree.
@@ -394,7 +395,7 @@ class AVLTreeList(object):
         return_list = [None] * self.root.size
         return_list_idx = 0
         curr_elem = self.root
-        listToArrayRec(return_list, return_list_idx, curr_elem)
+        listToArrayRec(return_list, curr_elem)
         return return_list
 
     """returns the size of the list 
