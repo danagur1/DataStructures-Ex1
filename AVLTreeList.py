@@ -237,7 +237,9 @@ class AVLTreeList(object):
         Al.parent = B
 
         B.update_size()
+        B.update_height()
         A.update_size()
+        A.update_height()
 
     def r_rotate(self, node):
         B = node
@@ -259,7 +261,9 @@ class AVLTreeList(object):
         Ar.parent = B
 
         B.update_size()
+        B.update_height()
         A.update_size()
+        A.update_height()
 
     def lr_rotate(self, node):
         C = node
@@ -287,8 +291,11 @@ class AVLTreeList(object):
         Br.parent = C
 
         C.update_size()
+        C.update_height()
         A.update_size()
+        A.update_height()
         B.update_size()
+        B.update_height()
 
     def rl_rotate(self, node):
         C = node
@@ -316,8 +323,11 @@ class AVLTreeList(object):
         Br.parent = A
 
         C.update_size()
+        C.update_height()
         A.update_size()
+        A.update_height()
         B.update_size()
+        B.update_height()
 
     def update_heights(self, node):
         while node is not None:
@@ -367,13 +377,13 @@ class AVLTreeList(object):
                 node.right = new_node
                 new_node.parent = node
 
-        # set size:
+        # update size:
         node = new_node.parent
         while node is not None:
             node.update_size()
             node = node.parent
 
-        # fix_the_tree:
+        # fix tree:
         node = new_node.parent
 
         while node is not None and abs(node.left.height - node.right.height) < 2:
@@ -386,6 +396,8 @@ class AVLTreeList(object):
         if node is None:
             return 0
         # now |BF(node)| = 2. rotation:
+        if abs(node.left.height - node.right.height) != 2:
+            print(node.left.height - node.right.height)
         if node.left.height > node.right.height:
             if node.left.left.height > node.left.right.height:
                 # right rotation:
@@ -400,6 +412,12 @@ class AVLTreeList(object):
             else:
                 # right then left rotation:
                 self.rl_rotate(node)
+
+        self.update_heights(new_node)
+        node = new_node.parent
+        while node is not None:
+            node.update_size()
+            node = node.parent
         return 1
 
     """deletes the i'th item in the list
