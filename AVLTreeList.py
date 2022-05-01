@@ -153,156 +153,12 @@ class AVLNode(object):
         return self.height != -1
 
 
-return_list_idx = 0
-
-
-def listToArrayRec(return_list, curr_elem):
-    global return_list_idx
-    if curr_elem.value is not None:
-        listToArrayRec(return_list, curr_elem.left)
-        return_list[return_list_idx] = curr_elem.value
-        return_list_idx += 1
-        listToArrayRec(return_list, curr_elem.right)
-
-
-def rotations(lst, node):
-    curr_rotate = node
-    count = 0
-    while curr_rotate is not None:
-        BF = curr_rotate.left.getHeight() - curr_rotate.right.getHeight()
-        if BF == 2:
-            LeftBF = curr_rotate.left.left.getHeight() - curr_rotate.left.right.getHeight()
-            if LeftBF == -1:
-                lst.lr_rotate(curr_rotate)
-                count += 2
-            if LeftBF == 1:
-                lst.r_rotation(curr_rotate)
-                count += 1
-            if LeftBF == 0:
-                lst.l_single_rotation(curr_rotate)
-                count += 1
-        if BF == -2:
-            RightBF = curr_rotate.right.left.getHeight() - curr_rotate.right.right.getHeight()
-            if RightBF == 1:
-                lst.rl_rotate(curr_rotate)
-                count += 2
-            if RightBF == -1:
-                lst.l_rotation(curr_rotate)
-                count += 1
-            if RightBF == 0:
-                lst.r_singel_rotation(curr_rotate)
-                count += 1
-        curr_rotate = curr_rotate.getParent()
-    return count
-
-
-def updates(node):
-    update_curr = node
-    while update_curr is not None:
-        update_curr.update_size()
-        update_curr.update_height()
-        update_curr = update_curr.getParent()
-
-
-def update_first(T):
-    curr = T.root
-    if curr.isRealNode():
-        while curr.left.isRealNode():
-            curr = curr.left
-        T.first_elem = curr
-
-
-def update_last(T):
-    curr = T.root
-    if curr.isRealNode():
-        while curr.right.isRealNode():
-            curr = curr.right
-        T.last_elem = curr
-
-
-def join(T1, x, T2):
-    """
-    global count_join, max_join, sum_join
-    curr_join = abs(T1.root.height-T2.root.height)
-    sum_join += curr_join
-    count_join += 1
-    max_join = max(max_join, curr_join)
-    """
-    a = T1.root
-    b = T2.root
-    if T1.root.height <= T2.root.height:
-        h = a.height
-        if h == -1:
-            update_first(T2)
-            update_last(T2)
-            updates(x)
-            if not T2.root.isRealNode():
-                T2.root = None
-            T2.insert(0, x.value)
-            return T2
-        if b.height == h or b.height == h-1:
-            x.right = b
-            a.parent = x
-            x.left = a
-            b.parent = x
-            T2.root = x
-        else:
-            while b.height > h:
-                b = b.left
-            x.setLeft(a)
-            a.setParent(x)
-            x.setParent(b.getParent())
-            b.getParent().setLeft(x)
-            x.setRight(b)
-            b.setParent(x)
-        # update sizes, heights:
-        updates(x)
-        # rotations:
-        rotations(T2, x)
-        return T2
-    else:
-        h = b.height
-        if h == -1:
-            update_first(T1)
-            update_last(T1)
-            updates(x)
-            if not T1.root.isRealNode():
-                T1.root = None
-            T1.insert(T1.root.left.size+T1.root.right.size+1, x.value)
-            return T1
-        if a.height == h - 1:
-            x.right = a
-            a.parent = x
-            x.left = b
-            b.parent = x
-            T1.root = x
-        else:
-            while a.height > h:
-                a = a.right
-            x.setRight(b)
-            b.setParent(x)
-            x.setParent(a.getParent())
-            a.getParent().setRight(x)
-            x.setLeft(a)
-            a.setParent(x)
-        # update sizes, heights:
-        updates(x)
-        # rotations:
-        rotations(T1, x)
-        return T1
-
-
 """
 A class implementing the ADT list, using an AVL tree.
 """
 
 
 class AVLTreeList(object):
-    """
-    Constructor, you are allowed to add more fields.
-
-    """
-
 
     def __init__(self):
         self.root = None
@@ -444,6 +300,139 @@ class AVLTreeList(object):
         A.update_height()
         B.update_size()
         B.update_height()
+
+    @staticmethod
+    def rotations(lst, node):
+        curr_rotate = node
+        count = 0
+        while curr_rotate is not None:
+            BF = curr_rotate.left.getHeight() - curr_rotate.right.getHeight()
+            if BF == 2:
+                LeftBF = curr_rotate.left.left.getHeight() - curr_rotate.left.right.getHeight()
+                if LeftBF == -1:
+                    lst.lr_rotate(curr_rotate)
+                    count += 2
+                if LeftBF == 1:
+                    lst.r_rotation(curr_rotate)
+                    count += 1
+                if LeftBF == 0:
+                    lst.l_single_rotation(curr_rotate)
+                    count += 1
+            if BF == -2:
+                RightBF = curr_rotate.right.left.getHeight() - curr_rotate.right.right.getHeight()
+                if RightBF == 1:
+                    lst.rl_rotate(curr_rotate)
+                    count += 2
+                if RightBF == -1:
+                    lst.l_rotation(curr_rotate)
+                    count += 1
+                if RightBF == 0:
+                    lst.r_singel_rotation(curr_rotate)
+                    count += 1
+            curr_rotate = curr_rotate.getParent()
+        return count
+
+    @staticmethod
+    def join(T1, x, T2):
+        a = T1.root
+        b = T2.root
+        if T1.root.height <= T2.root.height:
+            h = a.height
+            if h == -1:
+                AVLTreeList.update_first(T2)
+                AVLTreeList.update_last(T2)
+                AVLTreeList.updates(x)
+                if not T2.root.isRealNode():
+                    T2.root = None
+                T2.insert(0, x.value)
+                return T2
+            if b.height == h or b.height == h - 1:
+                x.right = b
+                a.parent = x
+                x.left = a
+                b.parent = x
+                T2.root = x
+            else:
+                while b.height > h:
+                    b = b.left
+                x.setLeft(a)
+                a.setParent(x)
+                x.setParent(b.getParent())
+                b.getParent().setLeft(x)
+                x.setRight(b)
+                b.setParent(x)
+            # update sizes, heights:
+            AVLTreeList.updates(x)
+            # rotations:
+            AVLTreeList.rotations(T2, x)
+            return T2
+        else:
+            h = b.height
+            if h == -1:
+                AVLTreeList.update_first(T1)
+                AVLTreeList.update_last(T1)
+                AVLTreeList.updates(x)
+                if not T1.root.isRealNode():
+                    T1.root = None
+                T1.insert(T1.root.left.size + T1.root.right.size + 1, x.value)
+                return T1
+            if a.height == h - 1:
+                x.right = a
+                a.parent = x
+                x.left = b
+                b.parent = x
+                T1.root = x
+            else:
+                while a.height > h:
+                    a = a.right
+                x.setRight(b)
+                b.setParent(x)
+                x.setParent(a.getParent())
+                a.getParent().setRight(x)
+                x.setLeft(a)
+                a.setParent(x)
+            # update sizes, heights:
+            AVLTreeList.updates(x)
+            # rotations:
+            AVLTreeList.rotations(T1, x)
+            return T1
+
+    """
+    listToArrayRec- used in listToArray
+    complexity: O(n)
+    """
+    return_list_idx = 0
+
+    @staticmethod
+    def listToArrayRec(return_list, curr_elem):
+        global return_list_idx
+        if curr_elem.value is not None:
+            AVLTreeList.listToArrayRec(return_list, curr_elem.left)
+            return_list[return_list_idx] = curr_elem.value
+            return_list_idx += 1
+            AVLTreeList.listToArrayRec(return_list, curr_elem.right)
+
+    def updates(node):
+        update_curr = node
+        while update_curr is not None:
+            update_curr.update_size()
+            update_curr.update_height()
+            update_curr = update_curr.getParent()
+
+    def update_first(T):
+        curr = T.root
+        if curr.isRealNode():
+            while curr.left.isRealNode():
+                curr = curr.left
+            T.first_elem = curr
+
+    def update_last(T):
+        curr = T.root
+        if curr.isRealNode():
+            while curr.right.isRealNode():
+                curr = curr.right
+            T.last_elem = curr
+
 
     """returns whether the list is empty
 
@@ -751,7 +740,7 @@ class AVLTreeList(object):
         return_list = [None] * self.root.size
         return_list_idx = 0
         curr_elem = self.root
-        listToArrayRec(return_list, curr_elem)
+        AVLTreeList.listToArrayRec(return_list, curr_elem)
         return return_list
 
     """returns the size of the list 
@@ -841,22 +830,12 @@ class AVLTreeList(object):
                 new_tree = AVLTreeList()
                 new_tree.root = parents[curr_idx].left
                 new_tree.root.parent = None
-                left_tree = join(new_tree, parents[curr_idx], left_tree)
+                left_tree = AVLTreeList.join(new_tree, parents[curr_idx], left_tree)
             else:
                 new_tree = AVLTreeList()
                 new_tree.root = parents[curr_idx].right
                 new_tree.root.parent = None
-                right_tree = join(right_tree, parents[curr_idx], new_tree)
-        """
-            while test_elem is not None:
-            curr_cost = abs(test_elem.left.height - test_elem.right.height)
-            sum_join += curr_cost
-            count_join += 1
-            max_join = max(max_join, curr_cost)
-            test_elem = test_elem.parent
-        print("avarage join: "+str(sum_join/count_join))
-        print("max join: " + str(max_join))
-        """
+                right_tree = AVLTreeList.join(right_tree, parents[curr_idx], new_tree)
         return left_tree, curr_elem.value, right_tree
 
     """concatenates lst to self
@@ -871,7 +850,7 @@ class AVLTreeList(object):
         height_diff = self.getRoot().getHeight() - lst.getRoot().getHeight()
         conect_elem = self.last_elem
         self.delete(self.root.size - 1)
-        self = join(self, conect_elem, lst)
+        self = AVLTreeList.join(self, conect_elem, lst)
         return abs(height_diff)
 
     """
