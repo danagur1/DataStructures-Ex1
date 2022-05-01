@@ -437,6 +437,9 @@ class AVLTreeList(object):
     """
     return_list_idx = 0
 
+    """
+    update size, height nodes up from node to root
+    """
     def updates(node):
         update_curr = node
         while update_curr is not None:
@@ -444,6 +447,9 @@ class AVLTreeList(object):
             update_curr.update_height()
             update_curr = update_curr.getParent()
 
+    """
+    update first_elem in list T
+    """
     def update_first(T):
         curr = T.root
         if curr.isRealNode():
@@ -451,6 +457,9 @@ class AVLTreeList(object):
                 curr = curr.left
             T.first_elem = curr
 
+    """
+    update last_elem in list T
+    """
     def update_last(T):
         curr = T.root
         if curr.isRealNode():
@@ -493,7 +502,6 @@ class AVLTreeList(object):
     def retrieve(self, i):
         assert 0 <= i < self.length()
         return self.find(i).value
-
 
     def update_heights(self, node):
         while node is not None:
