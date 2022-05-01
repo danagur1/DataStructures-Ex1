@@ -838,18 +838,17 @@ class AVLTreeList(object):
     @returns: the first index that contains val, -1 if not found.
     """
 
-    def search(self, val):
-        if self.getRoot().getSize() == 1:
-            return self.getRoot().getVal() == val
-        left_search = self.search((self.getRoot().getLeft()), val)
-        if left_search != -1:
-            return left_search
-        if self.getRoot().getVal() == val:
-            return val
-        right_search = self.search((self.getRoot().getRight()), val)
-        if right_search != -1:
-            return right_search
+    def search_rec(self, node, val):
+        if node.left is not None and self.search_rec(node.left, val) != -1:
+            return self.search_rec(node.left, val)
+        if node.value == val:
+            return node.left.size
+        if node.right is not None and self.search_rec(node.right, val) != -1:
+            return self.search_rec(node.right, val)+node.left.size+1
         return -1
+
+    def search(self, val):
+        return self.search_rec(self.root, val)
 
     """returns the root of the tree representing the list
 
@@ -861,43 +860,4 @@ class AVLTreeList(object):
         return self.root
 
 
-"""
-Q2: split
-T = AVLTreeList()
-max_join, count_join, sum_join = 0, 0, 0
-x = 10
-n = 1000*(2**x)
-a = random.sample(list(range(n)), n)
-for i in range(n):
-    T.insert(i, a[i])
-T.split(random.randint(1, n))
-print("avarage "+str(sum_join/count_join))
-print("max "+str(max_join))
-max_join, count_join, sum_join = 0, 0, 0
-T = AVLTreeList()
-for i in range(n):
-    T.insert(i, a[i])
-index2_item = T.root.left
-small = 0
-while index2_item.right is not None:
-    small += index2_item.left.size+1
-    index2_item = index2_item.right
-T.split(small+1)
-print("avarage "+str(sum_join/count_join))
-print("max "+str(max_join))
-print(small+1)
-"""
-
-T1 = AVLTreeList()
-for i in range(10):
-    T1.insert(i, i)
-T2 = AVLTreeList()
-for i in range(5):
-    T2.insert(i, i+10)
-print(T1.listToArray())
-print(T2.listToArray())
-T1.concat(T2)
-print(T1.listToArray())
-a, b, c = T1.split(11)
-print(a.listToArray(), b, c.listToArray())
 
