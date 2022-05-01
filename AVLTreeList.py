@@ -169,9 +169,9 @@ def rotations(lst, node):
     curr_rotate = node
     count = 0
     while curr_rotate is not None:
-        BF = curr_rotate.getLeft().getHeight() - curr_rotate.getRight().getHeight()
+        BF = curr_rotate.left.getHeight() - curr_rotate.right.getHeight()
         if BF == 2:
-            LeftBF = curr_rotate.getLeft().getLeft().getHeight() - curr_rotate.getLeft().getRight().getHeight()
+            LeftBF = curr_rotate.left.left.getHeight() - curr_rotate.left.right.getHeight()
             if LeftBF == -1:
                 lst.lr_rotate(curr_rotate)
                 count += 2
@@ -182,7 +182,7 @@ def rotations(lst, node):
                 lst.l_single_rotation(curr_rotate)
                 count += 1
         if BF == -2:
-            RightBF = curr_rotate.getRight().getLeft().getHeight() - curr_rotate.getRight().getRight().getHeight()
+            RightBF = curr_rotate.right.left.getHeight() - curr_rotate.right.right.getHeight()
             if RightBF == 1:
                 lst.rl_rotate(curr_rotate)
                 count += 2
@@ -248,7 +248,7 @@ def join(T1, x, T2):
             T2.root = x
         else:
             while b.height > h:
-                b = b.getLeft()
+                b = b.left
             x.setLeft(a)
             a.setParent(x)
             x.setParent(b.getParent())
@@ -278,7 +278,7 @@ def join(T1, x, T2):
             T1.root = x
         else:
             while a.height > h:
-                a = a.getRight()
+                a = a.right
             x.setRight(b)
             b.setParent(x)
             x.setParent(a.getParent())
@@ -310,26 +310,26 @@ class AVLTreeList(object):
         self.first_elem = None  # pointer to the first element in the list
 
     def l_single_rotation(self, z):
-        x = z.getLeft()
+        x = z.left
         if self.root is z:
             self.root = x
         x.setParent(z.getParent())
         if z.getParent() is not None:
             z.getParent().left = x
-        z.setLeft(x.getRight())
-        x.getRight().setParent(z)
+        z.setLeft(x.right)
+        x.right.setParent(z)
         x.setRight(z)
         z.setParent(x)
 
     def r_singel_rotation(self, z):
-        x = z.getRight()
+        x = z.right
         if self.root is z:
             self.root = x
         x.setParent(z.getParent())
         if z.getParent() is not None:
             z.getParent().right = x
-        z.setRight(x.getLeft())
-        x.getLeft().setParent(z)
+        z.setRight(x.left)
+        x.left.setParent(z)
         x.setLeft(z)
         z.setParent(x)
 
@@ -901,44 +901,3 @@ class AVLTreeList(object):
 
     def getRoot(self):
         return self.root
-
-
-"""
-Q2: split
-T = AVLTreeList()
-max_join, count_join, sum_join = 0, 0, 0
-x = 10
-n = 1000*(2**x)
-a = random.sample(list(range(n)), n)
-for i in range(n):
-    T.insert(i, a[i])
-T.split(random.randint(1, n))
-print("avarage "+str(sum_join/count_join))
-print("max "+str(max_join))
-max_join, count_join, sum_join = 0, 0, 0
-T = AVLTreeList()
-for i in range(n):
-    T.insert(i, a[i])
-index2_item = T.root.left
-small = 0
-while index2_item.right is not None:
-    small += index2_item.left.size+1
-    index2_item = index2_item.right
-T.split(small+1)
-print("avarage "+str(sum_join/count_join))
-print("max "+str(max_join))
-print(small+1)
-"""
-
-T1 = AVLTreeList()
-for i in range(10):
-    T1.insert(i, i)
-T2 = AVLTreeList()
-for i in range(5):
-    T2.insert(i, i+10)
-print(T1.listToArray())
-print(T2.listToArray())
-T1.concat(T2)
-print(T1.listToArray())
-a, b, c = T1.split(11)
-print(a.listToArray(), b, c.listToArray())
