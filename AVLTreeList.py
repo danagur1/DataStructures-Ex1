@@ -174,18 +174,18 @@ def rotations(lst, node):
                 lst.lr_rotate(curr_rotate)
                 count += 2
             if LeftBF == 1:
-                lst.r_rotatate(curr_rotate)
+                lst.r_rotation(curr_rotate)
                 count += 1
             if LeftBF == 0:
-                r_singel_rotatation(lst, curr_rotate)
+                lst.l_single_rotation(curr_rotate)
                 count += 1
         if BF == -2:
             RightBF = curr_rotate.getRight().getLeft().getHeight() - curr_rotate.getRight().getRight().getHeight()
             if RightBF == 1:
-                lst.rl_rotatate(curr_rotate)
+                lst.rl_rotate(curr_rotate)
                 count += 2
             if RightBF == -1:
-                lst.l_rotate(curr_rotate)
+                lst.l_rotation(curr_rotate)
                 count += 1
             if RightBF == 0:
                 lst.r_singel_rotation(curr_rotate)
@@ -826,7 +826,7 @@ class AVLTreeList(object):
     def concat(self, lst):
         height_diff = self.getRoot().getHeight() - lst.getRoot().getHeight()
         conect_elem = self.last_elem
-        self.delete(self.root.size-1)
+        self.delete(self.root.size - 1)
         self = join(self, conect_elem, lst)
         return abs(height_diff)
 
@@ -887,7 +887,7 @@ print("avarage "+str(sum_join/count_join))
 print("max "+str(max_join))
 print(small+1)
 """
-"""
+
 T1 = AVLTreeList()
 for i in range(10):
     T1.insert(i, i)
@@ -898,4 +898,6 @@ print(T1.listToArray())
 print(T2.listToArray())
 T1.concat(T2)
 print(T1.listToArray())
-"""
+a, b, c = T1.split(11)
+print(a.listToArray(), b, c.listToArray())
+
