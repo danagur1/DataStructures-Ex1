@@ -3,7 +3,7 @@
 # name1    - Dana Gur
 # id2      - 327703831
 # name2    - Ofer Bogoslavsky
-
+import random
 
 """A class represnting a node in an AVL tree"""
 
@@ -157,6 +157,87 @@ def listToArrayRec(return_list, curr_elem):
         return_list_idx += 1
         listToArrayRec(return_list, curr_elem.right)
 
+
+def single_rotation_l(lst, z):
+    if lst.root is z:
+        lst.root = x
+    x = z.getLeft()
+    x.setParent(z.getParent())
+    x.setRight(z)
+    z.setParent(x)
+    z.setLeft(x.getRight())
+    x.getRight().setParent(z)
+
+
+def single_rotation_r(lst, z):
+    if lst.root is z:
+        lst.root = x
+    x = z.getright()
+    x.setParent(z.getParent())
+    x.setLeft(z)
+    z.setParent(x)
+    z.setRight(x.getLeft())
+    x.getLeft().setParent(z)
+
+
+def rotations(lst, node):
+    curr_rotate = node
+    count = 0
+    while curr_rotate is not None:
+        BF = curr_rotate.getLeft().getSize() - curr_rotate.getRight().getSize()
+        curr_rotate = curr_rotate.getParent()
+        if BF == 2:
+            LeftBF = curr_rotate.getLeft().getLeft().getSize() - curr_rotate.getLeft().getRight().getSize()
+            if LeftBF == -1:
+                lst.lr_rotation(curr_rotate)
+                count += 2
+            if LeftBF == 1:
+                lst.r_rotation(curr_rotate)
+                count += 1
+            if LeftBF == 0:
+                r_singel_rotation(lst, curr_rotate)
+                count += 1
+        if BF == -2:
+            RightBF = curr_rotate.getLeft().getLeft().getSize() - curr_rotate.getLeft().getRight().getSize()
+            if RightBF == 1:
+                lst.rl_rotation(curr_rotate)
+                count += 2
+            if RightBF == -1:
+                lst.l_rotate(curr_rotate)
+                count += 1
+            if LeftBF == 0:
+                r_singel_rotation(lst, curr_rotate)
+                count += 1
+    return count
+
+
+def updates(node):
+    update_curr = node
+    while update_curr is not None:
+        update_curr.update_size()
+        update_curr.update_height()
+        update_curr = update_curr.getParent()
+
+
+def join(T1, x, T2):
+    if T1.height > T2.height:
+        T1, T2 = T2, T1
+    h = T1.height
+    while T2.height != h and T2.height != h-1:
+        T2 = T2.getLeft()
+    x.setLeft(T1)
+    T1.setParent(x)
+    x.setRight(T2)
+    T2.setParent(x)
+    x.setParent(T2.getParent())
+    T2.getParent().setLeft(x.getParent())
+    # update sizes, heights:
+    updates(x)
+    # rotations:
+    rotations(T2, x)
+    return T2
+
+
 """
 A class implementing the ADT list, using an AVL tree.
 """
@@ -172,53 +253,6 @@ class AVLTreeList(object):
         self.root = None
         self.last_elem = None  # pointer to the last element in the list
         self.first_elem = None  # pointer to the first element in the list
-
-    """returns whether the list is empty
-
-    @rtype: bool
-    @returns: True if the list is empty, False otherwise
-    """
-
-    def empty(self):
-        return self.root is None
-
-    def find(self, i):  # returns the i'th node (0 <= i < n)
-        assert 0 <= i < self.root.size
-        i += 1
-        node = self.root
-        small_items = 0  # number of items in list that are smaller than node (by index)
-        while node.isRealNode():
-            if node.left.size + small_items >= i:
-                node = node.left
-            elif node.left.size + small_items == i - 1:  # there are exactly i-1 items smaller than node
-                return node
-            else:  # all the left children of node are smaller than node.right
-                small_items += node.left.size + 1
-                node = node.right
-        raise Exception(f"problem in find({i})")  # we shouldn't get here
-
-    """"retrieves the value of the i'th item in the list
-
-        @type i: int
-        @pre: 0 <= i < self.length()
-        @param i: index in the list
-        @rtype: str
-        @returns: the the value of the i'th item in the list
-        """
-
-    def retrieve(self, i):
-        return self.find(i).value
-
-    """inserts val at position i in the list
-
-    @type i: int
-    @pre: 0 <= i <= self.length()
-    @param i: The intended index in the list to which we insert val
-    @type val: str
-    @param val: the value we inserts
-    @rtype: list
-    @returns: the number of rebalancing operation due to AVL rebalancing
-    """
 
     def l_rotate(self, node):
         B = node
@@ -322,6 +356,53 @@ class AVLTreeList(object):
         A.update_size()
         B.update_size()
 
+    """returns whether the list is empty
+
+    @rtype: bool
+    @returns: True if the list is empty, False otherwise
+    """
+
+    def empty(self):
+        return self.root is None
+
+    def find(self, i):  # returns the i'th node (0 <= i < n)
+        assert 0 <= i < self.root.size
+        i += 1
+        node = self.root
+        small_items = 0  # number of items in list that are smaller than node (by index)
+        while node.isRealNode():
+            if node.left.size + small_items >= i:
+                node = node.left
+            elif node.left.size + small_items == i - 1:  # there are exactly i-1 items smaller than node
+                return node
+            else:  # all the left children of node are smaller than node.right
+                small_items += node.left.size + 1
+                node = node.right
+        raise Exception(f"problem in find({i})")  # we shouldn't get here
+
+    """"retrieves the value of the i'th item in the list
+
+        @type i: int
+        @pre: 0 <= i < self.length()
+        @param i: index in the list
+        @rtype: str
+        @returns: the the value of the i'th item in the list
+        """
+
+    def retrieve(self, i):
+        return self.find(i).value
+
+    """inserts val at position i in the list
+
+    @type i: int
+    @pre: 0 <= i <= self.length()
+    @param i: The intended index in the list to which we insert val
+    @type val: str
+    @param val: the value we inserts
+    @rtype: list
+    @returns: the number of rebalancing operation due to AVL rebalancing
+    """
+
     def update_heights(self, node):
         while node is not None:
             node.update_height()
@@ -423,7 +504,12 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
-        return -1
+        i_node = find(i)
+        if i_node.getParent().getLeft() is i_node:
+            i_node.getParent().setLeft(AVLNode(None))
+        else:
+            i_node.getParent().setRight(AVLNode(None))
+        return rotations(self, i_node.getParent())
 
     """returns the value of the first item in the list
 
@@ -481,67 +567,29 @@ class AVLTreeList(object):
     """
 
     def split(self, i):
+        last_right, last_left = True, True
+        i_node = self.find(i)
+        curr_elem = i_node
+        last_left = i_node.left
+        last_right = i_node.right
+        while curr_elem is not None:
+            if curr_elem.parent.right is curr_elem:
+                last_left = join(curr_elem.parent.left, curr_elem.parent, last_left)
+            else:
+                last_right = join(curr_elem.parent.right, curr_elem.parent, last_right)
+            curr_elem = curr_elem.parent()
         right_tree = AVLTreeList()
-        first_left = True
         left_tree = AVLTreeList()
-        first_right = True
-        right_tree_curr, left_tree_curr = right_tree.root, None
-        curr_elem = self.root
-        curr_idx = curr_elem.left.size + 1
-        small_items = 0  # number of items in list that are smaller than node (by index)
-        while curr_idx != i:
-            if i < curr_idx:
-                if first_right:
-                    right_tree.root = curr_elem
-                    curr_elem.parent = None
-                    first_right = False
-                else:
-                    right_tree_curr.left = curr_elem
-                    curr_elem.parent = right_tree_curr
-                right_tree_curr = curr_elem
-                curr_elem = curr_elem.left
-            if i > curr_idx:
-                if first_left:
-                    left_tree.root = curr_elem
-                    curr_elem.parent = None
-                    first_left = False
-                else:
-                    left_tree_curr.right = curr_elem
-                    curr_elem.parent = left_tree_curr
-                small_items += curr_elem.left.size + 1
-                left_tree_curr = curr_elem
-                curr_elem = curr_elem.right
-            curr_idx = curr_elem.left.size + 1 + small_items
-        if right_tree_curr is None:
-            right_tree.root = curr_elem.right
-        else:
-            right_tree_curr.left = curr_elem.right
-            curr_elem.right.parent = right_tree_curr
-        if left_tree_curr is None:
-            left_tree.root = curr_elem.left
-        else:
-            left_tree_curr.right = curr_elem.left
-            curr_elem.left.parent = left_tree_curr
-        # update sizes in right tree:
-        curr_update = right_tree_curr
-        while curr_update is not None:
-            curr_update.update_size()
-            curr_update = curr_update.parent
-        # update sizes in left tree:
-        curr_update = left_tree_curr
-        while curr_update is not None:
-            curr_update.update_size()
-            curr_update = curr_update.parent
-        # update heights in right tree:
-        curr_update = right_tree_curr
-        while curr_update is not None:
-            curr_update.update_height()
-            curr_update = curr_update.parent
-        # update heights in left tree:
-        curr_update = left_tree_curr
-        while curr_update is not None:
-            curr_update.update_height()
-            curr_update = curr_update.parent
+        right_tree.root = last_right
+        right_tree.root = last_left
+        while test_elem is not None:
+            curr_cost = abs(test_elem.left.height - test_elem.right.height)
+            sum_join += curr_cost
+            count_join += 1
+            max_join = max(max_join, curr_cost)
+            test_elem = test_elem.parent
+        print("avarage join: "+str(sum_join/count_join))
+        print("max join: " + str(max_join))
         return left_tree, curr_elem.value, right_tree
 
     """concatenates lst to self
@@ -554,51 +602,12 @@ class AVLTreeList(object):
 
     def concat(self, lst):
         height_diff = self.getRoot().getHeight() - lst.getRoot().getHeight()
-        if height_diff >= 0:
-            h1 = self.getRoot().getHeight()
-            conect_elem = lst.first()
-            lst.delete(0)
-            v = self.getRoot()
-            h2 = lst.getRoot().getHeight()
-            while v.getHeight() >= lst.getRoot().getHeight():
-                v = v.getRight()
-            v.getParent().setRight(conect_elem)
-            conect_elem.setParent(v.getParent())
-            conect_elem.setLeft(v)
-            v.setParent(conect_elem)
-            conect_elem.setRight(lst.getRoot())
-            lst.getRoot().setParent(conect_elem)
-        else:
-            h1 = self.getRoot().getHeight()
-            conect_elem = lst.first()
-            lst.delete(0)
-            v = lst.getRoot()
-            h2 = lst.getRoot().getHeight()
-            while v.getHeight() >= self.getRoot().getHeight():
-                v = v.getLeft()
-            v.getParent().setLeft(conect_elem)
-            conect_elem.setParent(v.getParent())
-            conect_elem.setRight(v)
-            v.setParent(conect_elem)
-            conect_elem.setLeft(self.getRoot())
-            self.getRoot().setParent(conect_elem)
-            self = lst
-        curr_rotate = v.getParent()
-        while v != None:
-            vBF = curr_rotate.getLeft().getSize() - curr_rotate.getRight().getSize()
-            curr_rotate = curr_rotate.getParent()
-            if vBF == 2:
-                vLeftBF = curr_rotate.getLeft().getLeft().getSize() - curr_rotate.getLeft().getRight().getSIze()
-                if vLeftBF == -1:
-                    self.lr_rotation(curr_rotate)
-                else:
-                    self.r_rotation(curr_rotate)
-            if vBF == -2:
-                vRightBF = curr_rotate.getLeft().getLeft().getSize() - curr_rotate.getLeft().getRight().getSize()
-                if vRightBF == 1:
-                    self.r_rotation(curr_rotate)
-                else:
-                    self.l_rotate(curr_rotate)
+        conect_elem = self.last()
+        lst.delete(self.root.size-1)
+        new_tree = AVLTreeList
+        new_tree.root = join(self.root, conect_elem, lst.root)
+        return new_tree
+
         # update sizes:
         while v is not None:
             v = v.getRight().getSize() + v.getLeft().getSize() + 1
@@ -637,3 +646,28 @@ class AVLTreeList(object):
 
     def getRoot(self):
         return self.root
+
+
+"""
+T = AVLTreeList()
+x = 1
+a = random.sample(range(1000*(2**x)+1), 1000*(2**x)+1)
+for i in range(1000*(2**x)):
+    T.insert(i, a[i])
+T.split(random.randint(1, 1000*(2**x)+1))
+T = AVLTreeList()
+for i in range(1000*(2**x)):
+    T.insert(i, a[i])
+index2_item = T.root.left
+small = 0
+while index2_item.right is not None:
+    small = index2_item.left.size+1
+    index2_item = index2_item.right
+T.split(small+1)
+print(small+1)*/
+"""
+
+T = AVLTreeList()
+for i in range(6):
+    T.insert(i, i)
+T.split(5)
