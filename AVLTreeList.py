@@ -508,7 +508,7 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-        def insert(self, i, val):
+    def insert(self, i, val):
         assert 0 <= i <= self.length()
         new_node = AVLNode(val)
         new_node.height = 0
@@ -726,7 +726,7 @@ class AVLTreeList(object):
     @returns: the value of the first item, None if the list is empty
     """
 
-        def first(self):
+    def first(self):
         return self.first_elem.value
 
     """returns the value of the last item in the list
