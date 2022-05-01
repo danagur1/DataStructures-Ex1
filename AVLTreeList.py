@@ -165,6 +165,10 @@ class AVLTreeList(object):
         self.last_elem = None  # pointer to the last element in the list
         self.first_elem = None  # pointer to the first element in the list
 
+    """
+    rotations: left single rotation
+    @:param z: the node for rotation
+    """
     def l_single_rotation(self, z):
         x = z.left
         if self.root is z:
@@ -177,6 +181,10 @@ class AVLTreeList(object):
         x.setRight(z)
         z.setParent(x)
 
+    """
+    rotations: right single rotation
+    @:param z: the node for rotation
+    """
     def r_singel_rotation(self, z):
         x = z.right
         if self.root is z:
@@ -189,6 +197,10 @@ class AVLTreeList(object):
         x.setLeft(z)
         z.setParent(x)
 
+    """
+    rotations: left rotation
+    @:param note: the node for rotation
+    """
     def l_rotate(self, node):
         B = node
         A = node.right
@@ -213,6 +225,10 @@ class AVLTreeList(object):
         A.update_size()
         A.update_height()
 
+    """
+    rotations: right rotation
+    @:param note: the node for rotation
+    """
     def r_rotate(self, node):
         B = node
         A = node.left
@@ -237,6 +253,10 @@ class AVLTreeList(object):
         A.update_size()
         A.update_height()
 
+    """
+        rotations: left than right rotation
+        @:param note: the node for rotation
+    """
     def lr_rotate(self, node):
         C = node
         A = C.left
@@ -269,6 +289,10 @@ class AVLTreeList(object):
         B.update_size()
         B.update_height()
 
+    """
+    rotations: right that left rotation
+    @:param note: the node for rotation
+    """
     def rl_rotate(self, node):
         C = node
         A = C.right
@@ -301,6 +325,10 @@ class AVLTreeList(object):
         B.update_size()
         B.update_height()
 
+    """
+    make rotations up from node to root of lst
+    Complexity- O(h) = O(log n)
+    """
     @staticmethod
     def rotations(lst, node):
         curr_rotate = node
@@ -332,6 +360,12 @@ class AVLTreeList(object):
             curr_rotate = curr_rotate.getParent()
         return count
 
+    """
+    @pre: for all nodes 𝑥_1∈𝑇_1 and 𝑥_2∈𝑇_2 𝑥_1.key < 𝑥.key < 𝑥_2.key 
+    @:rtype: AVLTreeList
+    :returns: AVLTreeList containing all nodes 𝑥_1∈𝑇_1 and 𝑥_2∈𝑇_2, x
+    Complexity- O(T1.height-T2.height)
+    """
     @staticmethod
     def join(T1, x, T2):
         a = T1.root
@@ -403,15 +437,6 @@ class AVLTreeList(object):
     """
     return_list_idx = 0
 
-    @staticmethod
-    def listToArrayRec(return_list, curr_elem):
-        global return_list_idx
-        if curr_elem.value is not None:
-            AVLTreeList.listToArrayRec(return_list, curr_elem.left)
-            return_list[return_list_idx] = curr_elem.value
-            return_list_idx += 1
-            AVLTreeList.listToArrayRec(return_list, curr_elem.right)
-
     def updates(node):
         update_curr = node
         while update_curr is not None:
@@ -439,7 +464,6 @@ class AVLTreeList(object):
     @rtype: bool
     @returns: True if the list is empty, False otherwise
     """
-
     def empty(self):
         return self.root is None
 
@@ -466,20 +490,10 @@ class AVLTreeList(object):
         @rtype: str
         @returns: the the value of the i'th item in the list
         """
-
     def retrieve(self, i):
+        assert 0 <= i < self.length()
         return self.find(i).value
 
-    """inserts val at position i in the list
-
-    @type i: int
-    @pre: 0 <= i <= self.length()
-    @param i: The intended index in the list to which we insert val
-    @type val: str
-    @param val: the value we inserts
-    @rtype: list
-    @returns: the number of rebalancing operation due to AVL rebalancing
-    """
 
     def update_heights(self, node):
         while node is not None:
@@ -727,12 +741,24 @@ class AVLTreeList(object):
     def last(self):
         return self.last_elem.value
 
+    """
+    function used in listToArray
+    complexity- O(n)
+    """
+    @staticmethod
+    def listToArrayRec(return_list, curr_elem):
+        global return_list_idx
+        if curr_elem.value is not None:
+            AVLTreeList.listToArrayRec(return_list, curr_elem.left)
+            return_list[return_list_idx] = curr_elem.value
+            return_list_idx += 1
+            AVLTreeList.listToArrayRec(return_list, curr_elem.right)
+
     """returns an array representing list 
 
     @rtype: list
     @returns: a list of strings representing the data structure
     """
-
     def listToArray(self):
         global return_list_idx
         if self.root is None:
@@ -748,11 +774,11 @@ class AVLTreeList(object):
     @rtype: int
     @returns: the size of the list
     """
-
     def length(self):
         if self.root is None:
             return 0
         return self.root.size
+
 
     def _delete_without_fixes_or_updates_when_at_most_one_child(self, delete_node):
         if not delete_node.left.isRealNode():
@@ -799,7 +825,6 @@ class AVLTreeList(object):
     @returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
     right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
     """
-
     def split(self, i):
         last_right, last_left = True, True
         right_left = []
@@ -845,20 +870,12 @@ class AVLTreeList(object):
     @rtype: int
     @returns: the absolute value of the difference between the height of the AVL trees joined
     """
-
     def concat(self, lst):
         height_diff = self.getRoot().getHeight() - lst.getRoot().getHeight()
         conect_elem = self.last_elem
         self.delete(self.root.size - 1)
         self = AVLTreeList.join(self, conect_elem, lst)
         return abs(height_diff)
-
-    """
-    @type val: str
-    @param val: a value to be searched
-    @rtype: int
-    @returns: the first index that contains val, -1 if not found.
-    """
 
     def search_rec(self, node, val):
         if node.left is not None and self.search_rec(node.left, val) != -1:
@@ -869,6 +886,12 @@ class AVLTreeList(object):
             return self.search_rec(node.right, val)+node.left.size+1
         return -1
 
+    """
+    @type val: str
+    @param val: a value to be searched
+    @rtype: int
+    @returns: the first index that contains val, -1 if not found.
+    """
     def search(self, val):
         return self.search_rec(self.root, val)
 
